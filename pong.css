@@ -1,0 +1,32 @@
+body {
+    background-color: #171616;
+    color: rgb(218, 218, 216);
+}
+#pageWindow{
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+}
+
+#gameWindow{
+    border: 3px solid black;
+    height: 800px;
+    width: 800px;
+    /* padding: 10%; */
+    /* display: flex; */
+    /* flex-direction: column; */
+    align-items:center;
+    border-radius: 25px;
+}
+
+#gameTitle{
+    /* display: flex; */
+    /* align-items: center; */
+    /* flex-direction: column; */
+    font-size:large;
+    font-weight: 100;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 20px;
+    margin-top: 20px;
+
+}
