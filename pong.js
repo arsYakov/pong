@@ -28,10 +28,42 @@ let gameBox = {
 // TODO: Need to implement lives to end the game state.
 function startGame(){
     gameBox.start();
-    myPaddle = new gameRect(gameBox.height/8, 10, 'rgba(218, 218, 216,1)', ((gameBox.width / 2) - ((gameBox.height/8)/2) ), gameBox.height-40 );
-    pcPaddle = new gameRect(gameBox.height/8, 10, 'rgba(218, 218, 216,1)', ((gameBox.width / 2) - ((gameBox.height/8)/2) ), 40);
+    paddleWidth = gameBox.height/8;
+    paddleHeight = 10;
+    paddleColor = 'rgba(218, 218, 216,1)';
+    paddleBeginPosX = ((gameBox.width / 2) - ((gameBox.height/8)/2));
+    paddleBeginPosYPlayer = gameBox.height - 40;
+    paddleBeginPosYNPC = 40;
+    myPaddle = new gameRect(paddleWidth, paddleHeight, paddleColor, paddleBeginPosX, paddleBeginPosYPlayer);
+    pcPaddle = new gameRect(paddleWidth, paddleHeight, paddleColor, paddleBeginPosX, paddleBeginPosYNPC);
     displayScore = new gameText("", "white", 100,100);
-    firstBall = new gameBall(200, 100, 5.5, 0, 2 * Math.PI, "litegrey");
+    firstBall = spawnBall();
+};
+
+// This Broke Collision with the paddles
+// Update - Fixed Paddle Collisions.
+
+// Spawn Ball Function. This will return a ball at a random location. This should allow us to make mutiple balls
+function spawnBall(){
+    // need an x, y, radius, start, end, and color to make a ball
+    //(x, y, radius, start, end, color){
+    // We need to make a ball spawn zone that is outside of the paddle area
+    gameZoneXMin = 100;
+    gameZoneXMax = gameBox.width - 100;
+    gameZoneYMin = 100;
+    gameZoneYMax = gameBox.height - 100;
+    
+    x = Math.random() * (gameZoneXMax - gameZoneXMin) + gameZoneXMin;
+    y = Math.random() * (gameZoneYMax - gameZoneYMin) + gameZoneYMin;
+    
+    radius = 5.5;
+    circleStart = 0;
+    circleEnd = 2 * Math.PI;
+    circleColor = "litegrey";
+
+    ball = new gameBall(x, y, radius, circleStart, circleEnd, circleColor);
+    return ball;
+
 };
 
 // These are for the paddles, but could be named better
@@ -61,7 +93,7 @@ function gameText (text, color, x, y){
     this.update= function(){
         this.text = `Player: ${this.playerScore}, PC: ${this.pcScore}`;
         ctx = gameBox.context;
-        ctx.font = '30px Segoe UI'
+        ctx.font = '20px Segoe UI'
         ctx.fillStyle = color;
         ctx.fillText(this.text, this.x, this.y,);
         ctx.closePath();
@@ -97,21 +129,25 @@ function gameBall (x, y, radius, start, end, color){
         // console.log(this.x)
     },
     this.collision = function(){
-        if ((this.x <= 0) || (this.x >= gameBox.canvas.width - 20)){
+        if ((this.x <= 5) || (this.x >= gameBox.canvas.width - 5)){
             changeDirection(this, 'x');
-        } else if (this.y <= 0){
+        }; 
+        if (this.y <= 5){
             changeDirection(this, 'y');
             score('pc');
-        } else if (this.y >= gameBox.canvas.height){
+        }; 
+        if (this.y >= gameBox.canvas.height -5){
             changeDirection(this, 'y');
             score('player');
-        } else if ((this.y == myPaddle.y - myPaddle.height) && (this.x >= myPaddle.x) && (this.x <= myPaddle.x + myPaddle.width)){
+        };
+        if ((this.y >= myPaddle.y - myPaddle.height) && (this.x >= myPaddle.x && this.x <= myPaddle.x + myPaddle.width)){
             console.log('hit my paddle');
             changeDirection(this, 'y');
-        } else if ((this.y == pcPaddle.y + pcPaddle.height) && (this.x >= pcPaddle.x) && (this.x <= pcPaddle.x + pcPaddle.width)){
+        };
+        if ((this.y <= pcPaddle.y + pcPaddle.height) && (this.x >= pcPaddle.x && this.x <= pcPaddle.x + pcPaddle.width)){
             changeDirection(this, 'y');
             console.log('hit pcs paddle');
-        }
+        };
     }
 };
 // See notes on Game Ball. 
@@ -200,3 +236,10 @@ function score(side){
     displayScore.update();
 };
 
+
+
+
+// BUG LIST:
+// Ball passes thru paddle
+// Ball gets stuck on the goal zone - ideally should be 'fixed' with ball destruction on score
+// Frame stuttering ball and paddle
