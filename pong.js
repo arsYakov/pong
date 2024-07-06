@@ -105,6 +105,9 @@ function gameText (text, color, x, y){
 //        enabled way we are currently doing it.
 // TODO: Add a gravity component that that balls will be attracted to. 
 // TODO: Fix the collision system to something that approches sanity. 
+// TODO: Add radius factor to collision to fix bug.
+// TODO: Add velocity to attributes and then multiply by negative number to reverse!
+
 function gameBall (x, y, radius, start, end, color){
     this.x = x;
     this.y = y;
@@ -149,8 +152,12 @@ function gameBall (x, y, radius, start, end, color){
             console.log('hit pcs paddle');
         };
     }
+    this.score = function(){
+
+    };
 };
 // See notes on Game Ball. 
+// We can instead just multiply the velocity by -1 to reverse it. 
 function changeDirection(ball, direction){
     if (ball.xDirection == "positive" && direction == 'x'){
 
@@ -215,10 +222,10 @@ function makeBallTravel(ball){
 // TODO: Need to handle multiple game balls and add support for the AI to use Powers
 function pcAI(pcPaddle, firstBall){
     // console.log(pcPaddle, firstBall);
-    if (gameBox.frame % 2 == 0){
-        pcPaddle.update();
-        return;
-    }
+    //if (gameBox.frame % 2 == 0){
+    //    pcPaddle.update();
+    //      return;
+    //}
     let offset = firstBall.x - ((pcPaddle.width/3) - Math.floor(Math.random() * 10))
     pcPaddle.x = offset + Math.floor(Math.random() * 10);
     pcPaddle.update();
