@@ -45,8 +45,6 @@ function startGame(){
     myPaddle = new gameRect(paddleWidth, paddleHeight, paddleColor, paddleBeginPosX, paddleBeginPosYPlayer);
     pcPaddle = new gameRect(paddleWidth, paddleHeight, paddleColor, paddleBeginPosX, paddleBeginPosYNPC);
     displayScore = new gameText("", "white", 100,100);
-    //firstBall = spawnBall();
-    //spawnBall();
     spawnBall();
 };
 
@@ -101,12 +99,15 @@ function moveMe(event){
 // TODO: Make this intelligent. Need to add an actual variance so that there is a change that the player can score.
 // TODO: Need to handle multiple game balls and add support for the AI to use Powers
 function pcAI(pcPaddle, ball){
-    // console.log(pcPaddle, firstBall);
-    //if (gameBox.frame % 2 == 0){
-    //    pcPaddle.update();
-    //      return;
-    //}
-    //console.log(firstBall);
+    if (ball.length == 0) {
+        spawnBall();
+        spawnBall();
+        return;
+    };
+    if (gameBox.frame % 55 == 0){
+        pcPaddle.update();
+        return;
+    };
     ball = ball[0];
     let offset = ball.x - ((pcPaddle.width/3) - Math.floor(Math.random() * 10))
     pcPaddle.x = offset + Math.floor(Math.random() * 10);
@@ -117,14 +118,14 @@ function pcAI(pcPaddle, ball){
 // TODO: Carry the score after ball respawns.
 // TODO: Change location.
 function score(side){
-    spawnBall();
+    //spawnBall();
     if (side == 'pc'){
         displayScore.playerScore +=1;
     } else {
         displayScore.pcScore +=1;
     }
     displayScore.update();
-    console.log("from score, no ball?")
+    //console.log("from score, no ball?")
 };
 
 
@@ -171,7 +172,6 @@ function gameText (text, color, x, y){
 // TODO: Add a gravity component that that balls will be attracted to. 
 // TODO: Fix the collision system to something that approches sanity. 
 // TODO: Add radius factor to collision to fix bug.
-// TODO: Add velocity to attributes and then multiply by negative number to reverse!
 
 function gameBall (x, y, radius, start, end, color){
     this.x = x;
@@ -196,16 +196,13 @@ function gameBall (x, y, radius, start, end, color){
         ctx.closePath();
         if ((this.x <= 5) || (this.x >= gameBox.canvas.width - 5)){
             this.dx = this.dx * -1;
-            //changeDirection(this, 'x');
         }; 
         if (this.y <= 5){
-            //changeDirection(this, 'y');
             score('pc');
             this.dy = this.dy * -1;
             return false;
         }; 
         if (this.y >= gameBox.canvas.height -5){
-            //changeDirection(this, 'y');
             score('player');
             this.dy = this.dy * -1;
             return false;
@@ -213,10 +210,8 @@ function gameBall (x, y, radius, start, end, color){
         if ((this.y >= myPaddle.y - myPaddle.height) && (this.x >= myPaddle.x && this.x <= myPaddle.x + myPaddle.width)){
             console.log('hit my paddle');
             this.dy = this.dy * -1;
-            //changeDirection(this, 'y');
         };
         if ((this.y <= pcPaddle.y + pcPaddle.height) && (this.x >= pcPaddle.x && this.x <= pcPaddle.x + pcPaddle.width)){
-            //changeDirection(this, 'y');
             console.log('hit pcs paddle');
             this.dy = this.dy * -1;
         };
@@ -224,9 +219,6 @@ function gameBall (x, y, radius, start, end, color){
         this.y = this.y + this.dy;
         return true;
     }
-    this.score = function(){
-
-    };
 };
 
 
