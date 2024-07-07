@@ -53,11 +53,10 @@ function spawnBall(){
     // need an x, y, radius, start, end, and color to make a ball
     //(x, y, radius, start, end, color){
     // We need to make a ball spawn zone that is outside of the paddle area
-    console.log("SpawnBall():", balls);
-    gameZoneXMin = 100;
+    gameZoneXMin = 300;
     gameZoneXMax = gameBox.width - 100;
     gameZoneYMin = 100;
-    gameZoneYMax = gameBox.height - 100;
+    gameZoneYMax = gameBox.height - 300;
     
     x = Math.random() * (gameZoneXMax - gameZoneXMin) + gameZoneXMin;
     y = Math.random() * (gameZoneYMax - gameZoneYMin) + gameZoneYMin;
@@ -68,7 +67,6 @@ function spawnBall(){
     circleColor = "litegrey";
 
     balls.push(new gameBall(x, y, radius, circleStart, circleEnd, circleColor));
-    console.log("trying to spawn a ball")
 };
 
 // TODO: Figure out why the stuttering is happening
@@ -76,9 +74,9 @@ function spawnBall(){
 function updateGame(){
     gameBox.clear();
     gameBox.frame += 1;
-    myPaddle.update();
     balls = balls.filter(ball => ball.update());
     displayScore.update();
+    myPaddle.update();
     pcAI(pcPaddle,balls)
 };
 
@@ -97,10 +95,10 @@ function moveMe(event){
 
 // This is very primative
 // TODO: Make this intelligent. Need to add an actual variance so that there is a change that the player can score.
-// TODO: Need to handle multiple game balls and add support for the AI to use Powers
+// TODO: Need to handle multiple game balls and add support for the AI to use Powers.
+// TODO: Make the pcPaddle not just jump when a new ball is spawned in.
 function pcAI(pcPaddle, ball){
     if (ball.length == 0) {
-        spawnBall();
         spawnBall();
         return;
     };
@@ -118,7 +116,7 @@ function pcAI(pcPaddle, ball){
 // TODO: Carry the score after ball respawns.
 // TODO: Change location.
 function score(side){
-    //spawnBall();
+    spawnBall();
     if (side == 'pc'){
         displayScore.playerScore +=1;
     } else {
@@ -171,7 +169,6 @@ function gameText (text, color, x, y){
 //        enabled way we are currently doing it.
 // TODO: Add a gravity component that that balls will be attracted to. 
 // TODO: Fix the collision system to something that approches sanity. 
-// TODO: Add radius factor to collision to fix bug.
 
 function gameBall (x, y, radius, start, end, color){
     this.x = x;
@@ -182,10 +179,8 @@ function gameBall (x, y, radius, start, end, color){
     this.color = color;
     this.ballOwner;
     this.origin;
-    this.dx = 10; // X Velocity
-    this.dy = 10; // Y Velocity
-    //this.xSpeed = 10;
-    //this.ySpeed = 10;
+    this.dx = 6; // X Velocity
+    this.dy = 6; // Y Velocity
     this.update= function(){
         ctx = gameBox.context;
         ctx.fillStyle = color;
@@ -194,25 +189,27 @@ function gameBall (x, y, radius, start, end, color){
         ctx.arc(this.x, this.y, this.radius, this.start, this.end);
         ctx.stroke();
         ctx.closePath();
-        if ((this.x <= 5) || (this.x >= gameBox.canvas.width - 5)){
+        if ((this.x + this.radius <= 5) || (this.x + this.radius >= gameBox.canvas.width - 5)){
             this.dx = this.dx * -1;
         }; 
-        if (this.y <= 5){
+        if (this.y + this.radius <= 5){
             score('pc');
             this.dy = this.dy * -1;
             return false;
         }; 
-        if (this.y >= gameBox.canvas.height -5){
+        if (this.y + this.radius >= gameBox.canvas.height -5){
             score('player');
             this.dy = this.dy * -1;
             return false;
         };
-        if ((this.y >= myPaddle.y - myPaddle.height) && (this.x >= myPaddle.x && this.x <= myPaddle.x + myPaddle.width)){
+        if ((this.y + this.radius >= myPaddle.y - myPaddle.height) && (this.x + this.radius >= myPaddle.x && this.x + this.radius <= myPaddle.x + myPaddle.width)){
             console.log('hit my paddle');
+            this.dy = this.dy + 1;
             this.dy = this.dy * -1;
         };
-        if ((this.y <= pcPaddle.y + pcPaddle.height) && (this.x >= pcPaddle.x && this.x <= pcPaddle.x + pcPaddle.width)){
+        if ((this.y - this.radius <= pcPaddle.y + pcPaddle.height) && (this.x - this.radius >= pcPaddle.x && this.x - this.radius <= pcPaddle.x + pcPaddle.width)){
             console.log('hit pcs paddle');
+            this.dy = this.dy - 1;
             this.dy = this.dy * -1;
         };
         this.x = this.x + this.dx;
@@ -227,4 +224,4 @@ function gameBall (x, y, radius, start, end, color){
 // Ball passes thru paddle - fix is radius check. Need to implement.
 // Ball gets stuck on the goal zone - ideally should be 'fixed' with ball destruction on score
 // Frame stuttering ball and paddle
-// Ball spawns in but then deletes self from array. Game breaks on 2nd ball spawn. 
+// Ball sometimes goes into paddle, especially if hit on side of paddle
