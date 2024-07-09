@@ -18,7 +18,7 @@ let gameBox = {
     frame: 0,
     start: function(){
         this.context = this.canvas.getContext('2d');
-        this.interval = setInterval(updateGame, 20);
+        this.interval = setInterval(updateGame, 16);
     },
     clear: function(){
         this.context.clearRect(0,0, this.width, this.height)
@@ -28,8 +28,6 @@ let gameBox = {
 
 // Start game gets the gamebox and calls start. 
 // It then makes the player and pc paddles, draws the score, and places a ball.
-// TODO: We need to clean up the creations by pulling out their arguments to named variables as this is super confusing.
-// TODO: We also need to make it so that the game resets when a score is had, and that the ball spawns in a random location.
 // TODO: Need to add a Start Screen.
 // TODO: Need to implement lives to end the game state.
 function startGame(){
@@ -52,7 +50,6 @@ function startGame(){
 function spawnBall(){
     // need an x, y, radius, start, end, and color to make a ball
     //(x, y, radius, start, end, color){
-    // We need to make a ball spawn zone that is outside of the paddle area
     gameZoneXMin = 300;
     gameZoneXMax = gameBox.width - 100;
     gameZoneYMin = 100;
@@ -127,9 +124,6 @@ function score(side){
 };
 
 
-
-
-
 // These are for the paddles, but could be named better
 // The compiler seems to think these should be classes instead of whatever I've got going on right now.
 function gameRect (width, height, color, x, y){
@@ -184,11 +178,11 @@ function gameBall (x, y, radius, start, end, color){
     this.update= function(){
         ctx = gameBox.context;
         ctx.fillStyle = color;
-        ctx.fill();
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, this.start, this.end);
         ctx.stroke();
         ctx.closePath();
+        ctx.fill();
         if ((this.x + this.radius <= 5) || (this.x + this.radius >= gameBox.canvas.width - 5)){
             this.dx = this.dx * -1;
         }; 
