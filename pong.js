@@ -1,4 +1,4 @@
-
+//"use strict";
 // Why do we need mypaddle initialized here?
 let myPaddle;
 let playerScore = 0;
@@ -33,7 +33,6 @@ let gameBox = {
 function startGame(){
     balls = [];
     console.log("Start:", balls);
-    gameBox.start();
     paddleWidth = gameBox.height/8;
     paddleHeight = 10;
     paddleColor = 'rgba(218, 218, 216,1)';
@@ -44,6 +43,7 @@ function startGame(){
     pcPaddle = new gameRect(paddleWidth, paddleHeight, paddleColor, paddleBeginPosX, paddleBeginPosYNPC);
     displayScore = new gameText("", "white", 100,100);
     spawnBall();
+    gameBox.start();
 };
 
 // Spawn Ball Function. This will return a ball at a random location. This should allow us to make mutiple balls
@@ -87,6 +87,7 @@ function moveMe(event){
     if(relX > 0 && relX < gameBox.canvas.width){
         myPaddle.x = relX - myPaddle.width /2
     }
+    
     myPaddle.update();
 };
 
@@ -177,11 +178,12 @@ function gameBall (x, y, radius, start, end, color){
     this.dy = 6; // Y Velocity
     this.update= function(){
         ctx = gameBox.context;
-        ctx.fillStyle = color;
+        ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, this.start, this.end);
-        ctx.stroke();
-        ctx.closePath();
+        //ctx.strokeStyle = "#ff00ff";
+        //ctx.stroke();
+        //ctx.closePath();
         ctx.fill();
         if ((this.x + this.radius <= 5) || (this.x + this.radius >= gameBox.canvas.width - 5)){
             this.dx = this.dx * -1;
@@ -219,3 +221,4 @@ function gameBall (x, y, radius, start, end, color){
 // Ball gets stuck on the goal zone - ideally should be 'fixed' with ball destruction on score
 // Frame stuttering ball and paddle
 // Ball sometimes goes into paddle, especially if hit on side of paddle
+// 'Use strict' fails completely. 
