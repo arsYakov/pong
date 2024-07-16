@@ -5,7 +5,7 @@ let balls = [];
 
 window.onload = startGame;
 
-// Gamebox grabs the html doc area to draw in and sets our game loop in the start function under interval. I think.
+// Gamebox grabs the html doc area to draw in and sets our game loop in the start function under interval.
 let gameBox = {
     canvas: document.getElementById('pong'),
     height: 800,
