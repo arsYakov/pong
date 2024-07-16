@@ -1,14 +1,7 @@
-//"use strict";
-// Why do we need mypaddle initialized here?
 let myPaddle;
 let playerScore = 0;
 let pcScore = 0;
 let balls = [];
-console.log("Global:", balls);
-
-//document.addEventListener("DOMContentLoaded", (event) => {
-//    startGame();
-//});
 
 window.onload = startGame;
 
@@ -26,7 +19,6 @@ let gameBox = {
     clear: function(){
         this.context.clearRect(0,0, this.width, this.height)
     }
-    
 };
 
 // Start game gets the gamebox and calls start. 
@@ -70,10 +62,9 @@ function spawnBall(){
     balls.push(new gameBall(x, y, radius, circleStart, circleEnd, circleColor));
 };
 
-let oldTimeStamp;
+//let oldTimeStamp;
 
 // TODO: Figure out why the stuttering is happening
-// TODO: Fix bug on ballspawn with pcAI.
 function updateGame(/*timeStamp*/){
     //timeDelta = (timeStamp - oldTimeStamp) / 1000;
     //oldTimeStamp = timeStamp;
@@ -90,26 +81,19 @@ function updateGame(/*timeStamp*/){
     displayFPS.update();
     myPaddle.update();
     pcAI(pcPaddle,balls)
-    //window.requestAnimationFrame(updateGame);
 };
 
-// TODO: Add power menu
-// TODO: Figure out why the ball will pass thru the paddle sometimes
+//TODO: Adjust calls to this to match frame rate. 
 function moveMe(event){
-    // mousePos.labelX = event.clientX;
-    // mousePos.labelY = event.clientY;
     relX = event.clientX - gameBox.canvas.offsetLeft;
-
     if(relX > 0 && relX < gameBox.canvas.width){
         myPaddle.x = relX - myPaddle.width /2
     }
-    
     myPaddle.update();
 };
 
 // This is very primative
 // TODO: Make this intelligent. Need to add an actual variance so that there is a change that the player can score.
-// TODO: Need to handle multiple game balls and add support for the AI to use Powers.
 // TODO: Make the pcPaddle not just jump when a new ball is spawned in.
 function pcAI(pcPaddle, ball){
     if (ball.length == 0) {
@@ -127,7 +111,6 @@ function pcAI(pcPaddle, ball){
 };
 
 // This is kinda ok.
-// TODO: Carry the score after ball respawns.
 // TODO: Change location.
 function score(side){
     spawnBall();
@@ -137,12 +120,10 @@ function score(side){
         displayScore.pcScore +=1;
     }
     displayScore.update();
-    //console.log("from score, no ball?")
 };
 
 
 // These are for the paddles, but could be named better
-// The compiler seems to think these should be classes instead of whatever I've got going on right now.
 function gameRect (width, height, color, x, y){
     this.width = width;
     this.height = height;
@@ -157,7 +138,7 @@ function gameRect (width, height, color, x, y){
     }
 };
 // This is to display the score. I guess thats fine for now
-// TODO: Change the location atleast. 
+// TODO: Change the location at some point. 
 function gameText (text, color, x, y){
     this.text = text;
     this.color = color;
@@ -174,7 +155,6 @@ function gameText (text, color, x, y){
     }
 };
 
-// This is a mess. The way we are solving the movement of the ball really needs to be reworked. 
 // TODO: To enable powers we will need a list of balls to begin with, and these balls will need to know how to move without this static
 //        enabled way we are currently doing it.
 // TODO: Add a gravity component that that balls will be attracted to. 
@@ -196,9 +176,6 @@ function gameBall (x, y, radius, start, end, color){
         ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, this.start, this.end);
-        //ctx.strokeStyle = "#ff00ff";
-        //ctx.stroke();
-        //ctx.closePath();
         ctx.fill();
         ballX = this.x;// + this.radius;
         ballY = this.y;// + this.radius;
@@ -234,8 +211,6 @@ function gameBall (x, y, radius, start, end, color){
 
 
 // BUG LIST:
-// Ball passes thru paddle - fix is radius check. Need to implement.
-// Ball gets stuck on the goal zone - ideally should be 'fixed' with ball destruction on score
+// Ball passes thru paddle sometimes. 
 // Frame stuttering ball and paddle
 // Ball sometimes goes into paddle, especially if hit on side of paddle
-// 'Use strict' fails completely. 
