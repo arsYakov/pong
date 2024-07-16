@@ -6,9 +6,11 @@ let pcScore = 0;
 let balls = [];
 console.log("Global:", balls);
 
-document.addEventListener("DOMContentLoaded", (event) => {
-    startGame();
-});
+//document.addEventListener("DOMContentLoaded", (event) => {
+//    startGame();
+//});
+
+window.onload = startGame;
 
 // Gamebox grabs the html doc area to draw in and sets our game loop in the start function under interval. I think.
 let gameBox = {
@@ -19,6 +21,7 @@ let gameBox = {
     start: function(){
         this.context = this.canvas.getContext('2d');
         this.interval = setInterval(updateGame, 16);
+        //window.requestAnimationFrame(updateGame);
     },
     clear: function(){
         this.context.clearRect(0,0, this.width, this.height)
@@ -42,6 +45,7 @@ function startGame(){
     myPaddle = new gameRect(paddleWidth, paddleHeight, paddleColor, paddleBeginPosX, paddleBeginPosYPlayer);
     pcPaddle = new gameRect(paddleWidth, paddleHeight, paddleColor, paddleBeginPosX, paddleBeginPosYNPC);
     displayScore = new gameText("", "white", 100,100);
+    displayFPS = new gameText("", "white", 700,300);
     spawnBall();
     gameBox.start();
 };
@@ -66,15 +70,27 @@ function spawnBall(){
     balls.push(new gameBall(x, y, radius, circleStart, circleEnd, circleColor));
 };
 
+let oldTimeStamp;
+
 // TODO: Figure out why the stuttering is happening
 // TODO: Fix bug on ballspawn with pcAI.
-function updateGame(){
+function updateGame(/*timeStamp*/){
+    //timeDelta = (timeStamp - oldTimeStamp) / 1000;
+    //oldTimeStamp = timeStamp;
+
+    //fps = Math.round(1 / timeDelta);
+    //displayFPS.text = fps;
+
+
     gameBox.clear();
     gameBox.frame += 1;
     balls = balls.filter(ball => ball.update());
+    displayScore.text = `Player: ${displayScore.playerScore}, PC: ${displayScore.pcScore}`;
     displayScore.update();
+    displayFPS.update();
     myPaddle.update();
     pcAI(pcPaddle,balls)
+    //window.requestAnimationFrame(updateGame);
 };
 
 // TODO: Add power menu
@@ -150,7 +166,6 @@ function gameText (text, color, x, y){
     this.playerScore = 0;
     this.pcScore = 0;
     this.update= function(){
-        this.text = `Player: ${this.playerScore}, PC: ${this.pcScore}`;
         ctx = gameBox.context;
         ctx.font = '20px Segoe UI'
         ctx.fillStyle = color;
@@ -185,28 +200,30 @@ function gameBall (x, y, radius, start, end, color){
         //ctx.stroke();
         //ctx.closePath();
         ctx.fill();
-        if ((this.x + this.radius <= 5) || (this.x + this.radius >= gameBox.canvas.width - 5)){
+        ballX = this.x;// + this.radius;
+        ballY = this.y;// + this.radius;
+        if ((ballX <= 10) || (ballX >= gameBox.canvas.width - 5)){
             this.dx = this.dx * -1;
         }; 
-        if (this.y + this.radius <= 5){
+        if (ballY <= 5){
             score('pc');
-            this.dy = this.dy * -1;
             return false;
         }; 
-        if (this.y + this.radius >= gameBox.canvas.height -5){
+        if (ballY >= gameBox.canvas.height -5){
             score('player');
-            this.dy = this.dy * -1;
             return false;
         };
-        if ((this.y + this.radius >= myPaddle.y - myPaddle.height) && (this.x + this.radius >= myPaddle.x && this.x + this.radius <= myPaddle.x + myPaddle.width)){
-            console.log('hit my paddle');
-            this.dy = this.dy + 1;
-            this.dy = this.dy * -1;
+        if ((ballY >= myPaddle.y - myPaddle.height) 
+            && (ballX >= myPaddle.x && ballX <= myPaddle.x + myPaddle.width)){
+                    console.log('hit my paddle');
+                    this.dy = this.dy + 1;
+                    this.dy = this.dy * -1;
         };
-        if ((this.y - this.radius <= pcPaddle.y + pcPaddle.height) && (this.x - this.radius >= pcPaddle.x && this.x - this.radius <= pcPaddle.x + pcPaddle.width)){
-            console.log('hit pcs paddle');
-            this.dy = this.dy - 1;
-            this.dy = this.dy * -1;
+        if ((ballY <= pcPaddle.y + pcPaddle.height) 
+            && (ballX >= pcPaddle.x && ballX <= pcPaddle.x + pcPaddle.width)){
+                console.log('hit pcs paddle');
+                this.dy = this.dy - 1;
+                this.dy = this.dy * -1;
         };
         this.x = this.x + this.dx;
         this.y = this.y + this.dy;
